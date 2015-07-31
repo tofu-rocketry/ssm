@@ -222,6 +222,10 @@ class Ssm2(stomp.ConnectionListener):
         log.info("Received message. ID = %s", empaid)
         extracted_msg, signer, err_msg = self._handle_msg(body)
 
+        ack_id = headers['ack']
+        log.debug("Sending acknowledgment for message with id %s", ack_id)
+        self._conn.ack({'id': ack_id})
+
         try:
             # If the message is empty or the error message is not empty
             # then reject the message.
@@ -344,7 +348,7 @@ class Ssm2(stomp.ConnectionListener):
         '''
         log.info('Sending message: %s', msgid)
         headers = {'destination': self._dest, 'receipt': msgid,
-                   'empa-id': msgid}
+                   'empa-id': msgid, 'persistent': 'true'}
 
         if message is not None:
             to_send = crypto.sign(message, self._cert, self._key)
@@ -634,7 +638,7 @@ class Ssm2(stomp.ConnectionListener):
             # Use a static ID for the subscription ID because we only ever have
             # one subscription within a connection and ID is only considered
             # to differentiate subscriptions within a connection.
-            self._conn.subscribe(destination=self._listen, id=1, ack='auto')
+            self._conn.subscribe(destination=self._listen, id=1, ack='client')
             log.info('Subscribing to: %s', self._listen)
 
     def close_connection(self):
