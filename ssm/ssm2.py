@@ -222,9 +222,13 @@ class Ssm2(stomp.ConnectionListener):
         log.info("Received message. ID = %s", empaid)
         extracted_msg, signer, err_msg = self._handle_msg(body)
 
-        ack_id = headers['ack']
-        log.debug("Sending acknowledgment for message with id %s", ack_id)
-        self._conn.ack({'id': ack_id})
+        try:
+            ack_id = headers['ack']
+            log.debug("Sending acknowledgment for message with id %s", ack_id)
+            self._conn.ack({'id': ack_id})
+        except KeyError:
+            log.warn("Unable to acknowledge message - "
+                     "No ack header received for ID = %s", empaid)
 
         try:
             # If the message is empty or the error message is not empty
