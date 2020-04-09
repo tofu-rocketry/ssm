@@ -53,8 +53,8 @@ def check_cert_key(certpath, keypath):
     Uses openssl directly to fetch the modulus of each, which must be the same.
     """
     try:
-        cert = _from_file(certpath)
-        key = _from_file(keypath)
+        cert = _from_file(certpath).encode('utf-8')
+        key = _from_file(keypath).encode('utf-8')
     except IOError as e:
         log.error('Could not find cert or key file: %s', e)
         return False
@@ -67,7 +67,7 @@ def check_cert_key(certpath, keypath):
                stdin=PIPE, stdout=PIPE, stderr=PIPE)
     pubkey1, error = p1.communicate(cert)
 
-    if error != '':
+    if p1.returncode != 0:
         log.error(error)
         return False
 
@@ -75,7 +75,7 @@ def check_cert_key(certpath, keypath):
                stdin=PIPE, stdout=PIPE, stderr=PIPE)
     pubkey2, error = p2.communicate(key)
 
-    if error != '':
+    if p2.returncode != 0:
         log.error(error)
         return False
 
