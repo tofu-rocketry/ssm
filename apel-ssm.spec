@@ -1,13 +1,8 @@
-# Conditionally define python_sitelib
-%if ! (0%{?fedora} > 12 || 0%{?rhel} > 5)
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%endif
-
 Name:           apel-ssm
 Version:        3.0.0
 %define releasenumber 1
 Release:        %{releasenumber}%{?dist}
-Summary:        Secure stomp messenger
+Summary:        Secure STOMP Messenger
 
 Group:          Development/Languages
 License:        ASL 2.0
@@ -16,10 +11,7 @@ Source:         %{name}-%{version}-%{releasenumber}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
-# Build requirement for non fedora-packager systems (CentOS).
-%if ! (0%{?fedora} > 12 || 0%{?rhel} > 5)
 BuildRequires:  python-devel
-%endif
 
 Requires:       stomppy < 5.0.0, python-daemon, python-ldap
 Requires(pre):  shadow-utils
